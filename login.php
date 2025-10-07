@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $st->execute([$email]);
     $u = $st->fetch(PDO::FETCH_ASSOC);
 
-    if (!$u || !password_verify($pass, $u['password_hash'])) {
+    if (!$u || !password_verify($pass, $u['passhash'])) {
       $errors[] = "Credenciales incorrectas.";
     } else {
       // login ok

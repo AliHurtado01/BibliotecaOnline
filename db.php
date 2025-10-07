@@ -1,7 +1,7 @@
 <?php
 // db.php: conexión a MySQL usando PDO
 $DB_HOST = "localhost";
-$DB_NAME = "biblioteca_vg";
+$DB_NAME = "biblioteca";
 $DB_USER = "root";         // ajusta si no usas root
 $DB_PASS = "";             // ajusta tu contraseña de MySQL
 

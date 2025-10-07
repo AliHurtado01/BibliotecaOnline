@@ -43,7 +43,7 @@ function e($str) {
 
 // Valida año razonable (por ejemplo 1970..2100)
 function valid_year($y) {
-  return ctype_digit($y) && (int)$y >= 1970 && (int)$y <= 2100;
+  return ctype_digit($y) && (int)$y >= 1900 && (int)$y <= 2100;
 }
 
 // Comprueba URL válida (opcional)

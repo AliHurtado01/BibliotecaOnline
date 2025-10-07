@@ -72,4 +72,4 @@ $st->execute([
 
 clear_old();
 set_flash('ok', 'Videojuego añadido correctamente.');
-header("Location: index.php");
+header("Location: game_view.php");

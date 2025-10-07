@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Registrar
   $hash = password_hash($pass, PASSWORD_DEFAULT);
-  $st = $pdo->prepare("INSERT INTO users (name,email,password_hash) VALUES (?,?,?)");
+  $st = $pdo->prepare("INSERT INTO users (name,email,passhash) VALUES (?,?,?)");
   $st->execute([$name, $email, $hash]);
 
   set_flash('ok', "Registro completado. ¡Ahora puedes iniciar sesión!");
