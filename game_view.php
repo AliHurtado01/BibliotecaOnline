@@ -15,7 +15,7 @@ if (!$game) {
   exit;
 }
 
-$isOwner = is_logged() && current_user_id() === (int)$game['user_id'];
+$isOwner = is_logged() && current_user_id() === $game['user_id'];
 ?>
 <?php include "header.php"; ?>
 
