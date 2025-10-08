@@ -45,6 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <?php include "header.php"; ?>
+<script>
+  function showHint(str) {
+    const lengthRegex = /^.{9,}$/;
+    const specialsRegex = /(?:.*[!@#$%^&*()_\-=\[\]{};':"\\|,.<>\/?]){2,}/;
+    const numberRegex = /\d/;
+    const mayusMinusRegex = /(?=.*[A-Z])(?=.*[a-z])/;
+
+    document.getElementById('txtLength').style.color = lengthRegex.test(str) ? 'green' : 'red';
+    document.getElementById('txtSpecials').style.color = specialsRegex.test(str) ? 'green' : 'red';
+    document.getElementById('txtNumber').style.color = numberRegex.test(str) ? 'green' : 'red';
+    document.getElementById('txtMayusMinus').style.color = mayusMinusRegex.test(str) ? 'green' : 'red';
+  }
+</script>
+
 <h2>Registro</h2>
 
 <?php if ($msgs = flash('errors')): ?>
@@ -67,7 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="row">
     <div style="flex:1 1 240px">
       <label>Contraseña</label>
-      <input type="password" name="password" required>
+      <input type="password" name="password" required onkeyup="showHint(this.value)">
+      <p style=color:red id="txtLength">Tiene que tener mas de 8 caracteres</p>
+      <p style=color:red id="txtSpecials">Tiene que contener caracteres especiales</p>
+      <p style=color:red id="txtNumber">Tiene que contener numeros</p>
+      <p style=color:red id="txtMayusMinus">Tiene que contener mayusculas y minusculas</p>
     </div>
     <div style="flex:1 1 240px">
       <label>Repite la contraseña</label>
