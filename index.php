@@ -2,7 +2,6 @@
 require_once "db.php";
 require_once "helpers.php";
 
-// Traemos los juegos más recientes (puedes paginar si quieres)
 $st = $pdo->query("SELECT id, title, year, cover_path FROM games ORDER BY created_at DESC");
 $games = $st->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -11,7 +10,6 @@ $games = $st->fetchAll(PDO::FETCH_ASSOC);
 <h2>Catálogo</h2>
 <p class="muted">Resumen: título, año y carátula. Haz clic para ver los detalles.</p>
 <script>
-// (Aquí va el código JavaScript que te proporcioné arriba)
 function showResult(str) {
   if (str.length == 0) {
     document.getElementById("livesearch").innerHTML = "";
