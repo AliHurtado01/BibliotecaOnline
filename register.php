@@ -13,12 +13,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $errors = [];
 
+  // Validaciones de datos básicos
   if ($name === '') $errors[] = "El nombre es obligatorio.";
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "El email no es válido.";
-  if (strlen($pass) < 6) $errors[] = "La contraseña debe tener al menos 6 caracteres.";
-  if ($pass !== $re) $errors[] = "Las contraseñas no coinciden.";
 
-  // ¿email ya registrado?
+  // VALIDACIONES DE CONTRASEÑA
+  
+  // 1. Longitud de la contraseña (actualizado a 9 caracteres)
+  if (strlen($pass) < 9) {
+    $errors[] = "La contraseña debe tener al menos 9 caracteres.";
+  }
+  // 2. Debe contener al menos una mayúscula y una minúscula
+  if (!preg_match('/[A-Z]/', $pass) || !preg_match('/[a-z]/', $pass)) {
+    $errors[] = "La contraseña debe contener mayúsculas y minúsculas.";
+  }
+  // 3. Debe contener al menos un número
+  if (!preg_match('/\d/', $pass)) {
+    $errors[] = "La contraseña debe contener al menos un número.";
+  }
+  // 4. Debe contener al menos 2 caracteres especiales
+  if (preg_match_all('/[!@#$%^&*()_\-=\[\]{};\':"\\|,.<>\/?]/', $pass) < 2) {
+    $errors[] = "La contraseña debe contener al menos 2 caracteres especiales.";
+  }
+  // 5. Las contraseñas deben coincidir
+  if ($pass !== $re) {
+    $errors[] = "Las contraseñas no coinciden.";
+  }
+
+
+  // ¿email ya registrado? (Solo si no hay otros errores)
   if (empty($errors)) {
     $st = $pdo->prepare("SELECT id FROM users WHERE email = ?");
     $st->execute([$email]);
@@ -27,13 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
+  // Si hay algún error, volvemos al formulario de registro
   if (!empty($errors)) {
     set_flash('errors', $errors);
     header("Location: register.php");
     exit;
   }
 
-  // Registrar
+  // Si todo está bien, registramos al usuario
   $hash = password_hash($pass, PASSWORD_DEFAULT);
   $st = $pdo->prepare("INSERT INTO users (name,email,passhash) VALUES (?,?,?)");
   $st->execute([$name, $email, $hash]);
@@ -46,8 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <?php include "header.php"; ?>
 <script>
+  // Tu script de showHint() no necesita cambios
   function showHint(str) {
     const lengthRegex = /^.{9,}$/;
+    // He ajustado esta expresión para que coincida con la de PHP
     const specialsRegex = /(?:.*[!@#$%^&*()_\-=\[\]{};':"\\|,.<>\/?]){2,}/;
     const numberRegex = /\d/;
     const mayusMinusRegex = /(?=.*[A-Z])(?=.*[a-z])/;
@@ -82,10 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div style="flex:1 1 240px">
       <label>Contraseña</label>
       <input type="password" name="password" required onkeyup="showHint(this.value)">
-      <p style=color:red id="txtLength">Tiene que tener mas de 8 caracteres</p>
-      <p style=color:red id="txtSpecials">Tiene que contener caracteres especiales</p>
-      <p style=color:red id="txtNumber">Tiene que contener numeros</p>
-      <p style=color:red id="txtMayusMinus">Tiene que contener mayusculas y minusculas</p>
+      <p style=color:red id="txtLength">Debe tener al menos 9 caracteres</p>
+      <p style=color:red id="txtSpecials">Debe contener al menos 2 caracteres especiales</p>
+      <p style=color:red id="txtNumber">Debe contener al menos un número</p>
+      <p style=color:red id="txtMayusMinus">Debe contener mayúsculas y minúsculas</p>
     </div>
     <div style="flex:1 1 240px">
       <label>Repite la contraseña</label>
