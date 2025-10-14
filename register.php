@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = trim($_POST['email'] ?? '');
   $pass  = $_POST['password'] ?? '';
   $re    = $_POST['password2'] ?? '';
+  $perfimg = $_POST["perfilimg"] == '';
 
   $errors = [];
 
@@ -18,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "El email no es válido.";
 
   // VALIDACIONES DE CONTRASEÑA
-  
+
   // 1. Longitud de la contraseña (actualizado a 9 caracteres)
   if (strlen($pass) < 9) {
     $errors[] = "La contraseña debe tener al menos 9 caracteres.";
@@ -59,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Si todo está bien, registramos al usuario
   $hash = password_hash($pass, PASSWORD_DEFAULT);
-  $st = $pdo->prepare("INSERT INTO users (name,email,passhash) VALUES (?,?,?)");
-  $st->execute([$name, $email, $hash]);
+  $st = $pdo->prepare("INSERT INTO users (name,email,passhash, perfilimg) VALUES (?,?,?,?)");
+  $st->execute([$name, $email, $hash, $perfimg]);
 
   set_flash('ok', "Registro completado. ¡Ahora puedes iniciar sesión!");
   clear_old();
@@ -116,6 +117,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div style="flex:1 1 240px">
       <label>Repite la contraseña</label>
       <input type="password" name="password2" required>
+    </div>
+    <div>
+      <label>Inserta tu imagen de perfil</label>
+      <input type="file" name="perfilimg" accept="image/jpeg,image/png">
+      <p>Si no subes una imagen de perfil, pondremos una por defecto.</p>
     </div>
   </div>
   <br>
