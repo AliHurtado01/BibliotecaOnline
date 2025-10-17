@@ -51,6 +51,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
+  // Subida de imagen de perfil
+  $profileImagePath = 'img/avatar_default.png'; // Avatar por defecto
+  if (!empty($_FILES['profile_image']['name'])) {
+    $f = $_FILES['profile_image'];
+    if ($f['error'] === UPLOAD_ERR_OK) {
+      $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png'];
+      $mime = mime_content_type($f['tmp_name']);
+      if (!isset($allowed[$mime])) {
+        $errors[] = "Formato de imagen de perfil no permitido. Sube JPG o PNG.";
+      } else {
+        $ext = $allowed[$mime];
+        if (!is_dir('uploads/avatars')) mkdir('uploads/avatars', 0777, true);
+        $newName = 'uploads/avatars/' . uniqid('avatar_', true) . '.' . $ext;
+        if (!move_uploaded_file($f['tmp_name'], $newName)) {
+          $errors[] = "No se pudo guardar la imagen de perfil.";
+        } else {
+          $profileImagePath = $newName;
+        }
+      }
+    } elseif ($f['error'] !== UPLOAD_ERR_NO_FILE) {
+      $errors[] = "Error al subir la imagen de perfil (código " . $f['error'] . ").";
+    }
+  }
+
+  if (!empty($errors)) {
+    set_flash('errors', $errors);
+    header("Location: register.php");
+    exit;
+  }
+
   // Si hay algún error, volvemos al formulario de registro
   if (!empty($errors)) {
     set_flash('errors', $errors);
@@ -61,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Si todo está bien, registramos al usuario
   $hash = password_hash($pass, PASSWORD_DEFAULT);
   $st = $pdo->prepare("INSERT INTO users (name,email,passhash, perfilimg) VALUES (?,?,?,?)");
-  $st->execute([$name, $email, $hash, $perfimg]);
+  $st->execute([$name, $email, $hash, $profileImagePath]);
 
   set_flash('ok', "Registro completado. ¡Ahora puedes iniciar sesión!");
   clear_old();
@@ -118,13 +148,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <label>Repite la contraseña</label>
       <input type="password" name="password2" required>
     </div>
-    <div>
-      <label>Inserta tu imagen de perfil</label>
-      <input type="file" name="perfilimg" accept="image/jpeg,image/png">
-      <p>Si no subes una imagen de perfil, pondremos una por defecto.</p>
+    <div class="row" style="margin-top:12px;">
+      <div style="flex:1 1 320px">
+        <label>Imagen de Perfil (opcional: jpg/png)</label>
+        <input type="file" name="perfilimg" accept="image/jpeg,image/png">
+        <p class="muted">Si no subes una imagen, usaremos un avatar por defecto.</p>
+        <button class="btn primary" type="submit">Crear cuenta</button>
+      </div>
     </div>
-  </div>
-  <br>
-  <button class="btn primary" type="submit">Crear cuenta</button>
 </form>
 <?php include "footer.php"; ?>
