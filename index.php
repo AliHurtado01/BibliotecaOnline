@@ -40,7 +40,7 @@ $games = $st->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 
-<?php // La etiqueta </head> estaba mal, ahora la estructura es correcta con el script al final ?>
+<?php ?>
 <script>
 function showResult(str) {
   if (str.length == 0) {

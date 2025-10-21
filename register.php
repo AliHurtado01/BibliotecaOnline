@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Subida de imagen de perfil
   $profileImagePath = 'img/avatar_default.png'; // Avatar por defecto
   
-  // Usamos 'profile_image' para coincidir con el form
+
   if (!empty($_FILES['profile_image']['name'])) {
     $f = $_FILES['profile_image'];
     if ($f['error'] === UPLOAD_ERR_OK) {

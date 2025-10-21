@@ -26,7 +26,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email'],
-            'profile_image' => $user['profile_image'] // CORREGIDO: de 'perfilimg' a 'profile_image'
+            'profile_image' => $user['profile_image']
         ];
     } else {
         // Borrar cookie si el token no es válido o ha expirado

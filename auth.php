@@ -21,7 +21,7 @@ function current_user_id() {
 }
 
 function set_remember_cookie($user_id) {
-  global $pdo; // Necesitamos acceso a la conexión PDO
+  global $pdo; // 
   $token = bin2hex(random_bytes(32)); // Token seguro
   $expires_in = 60 * 60 * 24 * 30; // 30 días
   $expires_at = date('Y-m-d H:i:s', time() + $expires_in);
