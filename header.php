@@ -81,7 +81,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
         <a href="game_new.php">Añadir juego</a>
         <a href="stats.php">Estadísticas</a>
         <div class="profile-menu">
-          <img src="<?= htmlspecialchars($_SESSION['user']['profile_image'] ?: 'img/avatar_default.png') ?>" alt="Perfil" class="avatar">
+          <img src="<?= htmlspecialchars($_SESSION['user']['profile_image'] ?? 'img/avatar_default.png') ?>" alt="Perfil" class="avatar">
           <div class="dropdown-content">
             <a href="edit_profile.php">Editar Perfil</a>
             <a href="logout.php">Cerrar sesión (<?= htmlspecialchars($_SESSION['user']['name']) ?>)</a>
