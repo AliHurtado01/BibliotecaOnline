@@ -6,7 +6,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Lógica para el "Recuérdame"
 if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
-    require_once 'db.php';
+    // Aseguramos que db.php se cargue solo si es necesario
+    if (!isset($pdo)) {
+      require_once 'db.php';
+    }
+    
     $token = $_COOKIE['remember_me'];
     $st = $pdo->prepare(
         "SELECT u.* FROM users u
@@ -15,12 +19,14 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
     );
     $st->execute([$token]);
     $user = $st->fetch(PDO::FETCH_ASSOC);
+    
     if ($user) {
+        // Guardamos los datos correctos en la sesión
         $_SESSION['user'] = [
             'id' => $user['id'],
             'name' => $user['name'],
             'email' => $user['email'],
-            'perfilimg' => $user['perfilimg']
+            'profile_image' => $user['profile_image'] // CORREGIDO: de 'perfilimg' a 'profile_image'
         ];
     } else {
         // Borrar cookie si el token no es válido o ha expirado
@@ -35,6 +41,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
   <title>Biblioteca de Videojuegos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    /* ... (Todos tus estilos CSS van aquí) ... */
     body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #f5f6f8; color: #222 }
     header { background: #4a148c; color: #fff; padding: 12px 16px; display: flex; gap: 16px; align-items: center; justify-content: space-between }
     a { color: #4a148c; text-decoration: none }
@@ -74,7 +81,7 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
         <a href="game_new.php">Añadir juego</a>
         <a href="stats.php">Estadísticas</a>
         <div class="profile-menu">
-          <img src="<?= htmlspecialchars($_SESSION['user']['perfilimg'] ?: '/BibliotecaOnline/img/avatar_default.png') ?>" alt="Perfil" class="avatar">
+          <img src="<?= htmlspecialchars($_SESSION['user']['profile_image'] ?: 'img/avatar_default.png') ?>" alt="Perfil" class="avatar">
           <div class="dropdown-content">
             <a href="edit_profile.php">Editar Perfil</a>
             <a href="logout.php">Cerrar sesión (<?= htmlspecialchars($_SESSION['user']['name']) ?>)</a>
@@ -86,4 +93,4 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
       <?php endif; ?>
     </nav>
   </header>
-  <div class="container">
+  <div class="container"></div>

@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = trim($_POST['email'] ?? '');
   $pass  = $_POST['password'] ?? '';
   $re    = $_POST['password2'] ?? '';
-  $perfimg = $_POST["perfilimg"] == '';
 
   $errors = [];
 
@@ -19,24 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "El email no es válido.";
 
   // VALIDACIONES DE CONTRASEÑA
-
-  // 1. Longitud de la contraseña (actualizado a 9 caracteres)
   if (strlen($pass) < 9) {
     $errors[] = "La contraseña debe tener al menos 9 caracteres.";
   }
-  // 2. Debe contener al menos una mayúscula y una minúscula
   if (!preg_match('/[A-Z]/', $pass) || !preg_match('/[a-z]/', $pass)) {
     $errors[] = "La contraseña debe contener mayúsculas y minúsculas.";
   }
-  // 3. Debe contener al menos un número
   if (!preg_match('/\d/', $pass)) {
     $errors[] = "La contraseña debe contener al menos un número.";
   }
-  // 4. Debe contener al menos 2 caracteres especiales
   if (preg_match_all('/[!@#$%^&*()_\-=\[\]{};\':"\\|,.<>\/?]/', $pass) < 2) {
     $errors[] = "La contraseña debe contener al menos 2 caracteres especiales.";
   }
-  // 5. Las contraseñas deben coincidir
   if ($pass !== $re) {
     $errors[] = "Las contraseñas no coinciden.";
   }
@@ -53,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Subida de imagen de perfil
   $profileImagePath = 'img/avatar_default.png'; // Avatar por defecto
+  
+  // Usamos 'profile_image' para coincidir con el form
   if (!empty($_FILES['profile_image']['name'])) {
     $f = $_FILES['profile_image'];
     if ($f['error'] === UPLOAD_ERR_OK) {
@@ -75,12 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  if (!empty($errors)) {
-    set_flash('errors', $errors);
-    header("Location: register.php");
-    exit;
-  }
-
   // Si hay algún error, volvemos al formulario de registro
   if (!empty($errors)) {
     set_flash('errors', $errors);
@@ -90,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Si todo está bien, registramos al usuario
   $hash = password_hash($pass, PASSWORD_DEFAULT);
-  $st = $pdo->prepare("INSERT INTO users (name,email,passhash, perfilimg) VALUES (?,?,?,?)");
+  // Usamos la columna 'profile_image'
+  $st = $pdo->prepare("INSERT INTO users (name, email, passhash, profile_image) VALUES (?, ?, ?, ?)");
   $st->execute([$name, $email, $hash, $profileImagePath]);
 
   set_flash('ok', "Registro completado. ¡Ahora puedes iniciar sesión!");
@@ -104,7 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Tu script de showHint() no necesita cambios
   function showHint(str) {
     const lengthRegex = /^.{9,}$/;
-    // He ajustado esta expresión para que coincida con la de PHP
     const specialsRegex = /(?:.*[!@#$%^&*()_\-=\[\]{};':"\\|,.<>\/?]){2,}/;
     const numberRegex = /\d/;
     const mayusMinusRegex = /(?=.*[A-Z])(?=.*[a-z])/;
@@ -124,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 <?php endif; ?>
 
-<form method="post" autocomplete="off">
+<form method="post" autocomplete="off" enctype="multipart/form-data">
   <div class="row">
     <div style="flex:1 1 280px">
       <label>Nombre</label>
@@ -148,13 +137,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <label>Repite la contraseña</label>
       <input type="password" name="password2" required>
     </div>
-    <div class="row" style="margin-top:12px;">
+  </div>
+  <div class="row" style="margin-top:12px;">
       <div style="flex:1 1 320px">
         <label>Imagen de Perfil (opcional: jpg/png)</label>
-        <input type="file" name="perfilimg" accept="image/jpeg,image/png">
+        <input type="file" name="profile_image" accept="image/jpeg,image/png">
         <p class="muted">Si no subes una imagen, usaremos un avatar por defecto.</p>
-        <button class="btn primary" type="submit">Crear cuenta</button>
       </div>
-    </div>
+  </div>
+  <br>
+  <button class="btn primary" type="submit">Crear cuenta</button>
 </form>
 <?php include "footer.php"; ?>
